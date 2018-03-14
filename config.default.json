@@ -1,0 +1,21 @@
+{
+  "docker_environment": {
+  },
+  "certbot": {
+    "docker_image": "certbot/dns-route53:v0.22.0",
+    "docker_container": "certbot",
+    "aws_credentials": "~/.aws/credentials",
+    "email": "set_me@domain.com",
+    "server": "https://acme-staging-v02.api.letsencrypt.org/directory"
+  },
+  "chef": {
+    "docker_image": "chef/chefdk:2",
+    "data_bag": "letsencrypt",
+    "admins": ["admin1", "admin2"]
+  },
+  "backends": [
+    "chef_vault"
+  ],
+  "certificates": {
+  }
+}
