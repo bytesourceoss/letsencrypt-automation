@@ -1,3 +1,4 @@
+require 'etc'
 require_relative 'helpers'
 
 # Cerbot module
@@ -25,6 +26,10 @@ module Certbot
   def renew(name, domains)
     Helpers.info_log("Registering/Renewing certificate #{name} for domains #{domains.join(',')}")
     run("certonly --non-interactive --dns-route53 --cert-name #{name} --domains #{domains.join(',')}")
+
+    # Fix permissions for etc_letsencrypt so we can actually commit it to GIT
+    user = Etc.getpwuid
+    Helpers.run_command("docker exec -i #{Helpers.config['certbot']['docker_container']} chown -R #{user.uid}:#{user.gid} /etc/letsencrypt")
   end
 
   def run(cmd)

@@ -12,8 +12,8 @@ Rake.application.options.suppress_backtrace_pattern = %r{/} # Suppress trace whe
 desc 'Initialize project'
 task :init do
   Helpers.log Certbot.init
-  # ChefVault.init if Helpers.config['backends'].key?('chef_vault')
-  # HashicorpVault.init if Helpers.config['backends'].key?('hashicorp_vault')
+  Helpers.log ChefVault.init if Helpers.config['steps'].include?('chef_vault')
+  # HashicorpVault.init if Helpers.config['steps'].key?('hashicorp_vault')
 end
 
 desc 'Displays Help'
@@ -56,11 +56,14 @@ end
 namespace :chef_vault do
   desc 'Upload all changed certificates as chef vaults'
   task :upload do
-    ChefVault.upload
+    Helpers.config['certificates'].each do |name, props|
+      Helpers.log ChefVault.upload(name, props['chef_vault'] || {})
+    end
   end
-end
+end if Helpers.config['steps'].include?('chef_vault')
 
 desc 'Cleanup all temporary files, docker containers etc'
 task :cleanup do
   Helpers.log Certbot.cleanup
+  Helpers.log ChefVault.cleanup if Helpers.config['steps'].include?('chef_vault')
 end

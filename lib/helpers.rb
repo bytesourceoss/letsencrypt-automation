@@ -1,6 +1,7 @@
 require 'json'
 require 'fileutils'
 require 'mixlib/shellout'
+require 'deep_merge'
 
 # Helpers module for stuff that is always needed
 module Helpers
@@ -27,7 +28,7 @@ module Helpers
                     {}
                   end
 
-    @@config = default_config.merge(user_config)
+    @@config = default_config.deep_merge!(user_config, {:overwrite_arrays => true})
   end
 
   # Simple info logger using the log helper
@@ -49,7 +50,7 @@ module Helpers
       puts out[:stdout] unless out[:stdout].nil? || out[:stdout].empty?
     else
       puts "--- Failed with exit code #{out[:return]}"
-      puts "Command was: #{out[:cmd]}"
+      puts "Command was: #{out[:cmd]}" if out.key?('cmd')
       unless out[:stdout].empty?
         puts "--- STDOUT:"
         puts out[:stdout].strip

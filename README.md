@@ -10,7 +10,9 @@ To run this you need at least:
 
   * Git
   * Docker
-  * Ruby (>= 2)
+  * Ruby (>= 2) and Bundler
+
+You also have to initialize the Chef Data Bag used for the certificates. By default that is called `letsencrypt` via `knife data bag create letsencrypt`.
 
 ### Config
 
@@ -33,9 +35,10 @@ Create a file called `config.json` alongside the `config.default.json` and fill 
   "chef": {
     "docker_image": "docker.local/chef/chefdk:v2",
     "data_bag": "letsencrypt",
+    "config_dir": "~/.chef",
     "admins": ["admin1", "admin2"]
   },
-  "backends": [
+  "steps": [
     "chef_vault"
   ],
   "certificates": {
@@ -70,7 +73,14 @@ rake init
 rake certbot:register
 ```
 
-once and commit the changes.
+once and commit the changes. With the account registered and the Chef Data Bag create the usual workflow is to update the `config.json` with the certificates that should be created and then to run:
+
+```
+rake init
+rake certbot:renew
+rake chef_vault:upload
+rake cleanup
+```
 
 ### Running in Jenkins
 
@@ -98,3 +108,5 @@ Pretty much everything I guess...
   * How to upload only changed certificates
     * Read state from git?
     * Keep state file with changes?
+  * Change Rake tasks to be able to take a list of certificates as argument
+  * Add Chef Vault refresh rake task
